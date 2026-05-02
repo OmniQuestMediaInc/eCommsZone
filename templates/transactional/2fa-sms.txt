@@ -1,0 +1,14 @@
+{{/*
+  eCommsZone — Transactional SMS Template
+  Name: 2fa-sms
+  Channel: SMS (Brevo transactional SMS via eCommsZone)
+  Triggered by: auth.2fa.code_requested
+  Length budget: keep under 160 GSM-7 characters to stay in a single segment.
+  Merge tokens:
+    {{ .Tx.Code }}                — 6-digit numeric code
+    {{ .Tx.ExpiresInMinutes }}    — integer (typically 5 or 10)
+  Compliance:
+    - "STOP to opt out" is mandatory in CA/US (TCPA / CRTC).
+    - Sender ID configured at the account level (BREVO_SMS_SENDER).
+*/}}
+OmniQuest: {{ .Tx.Code }} is your verification code. It expires in {{ .Tx.ExpiresInMinutes }} min. Never share it. Reply STOP to opt out.

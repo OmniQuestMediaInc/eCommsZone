@@ -1,0 +1,102 @@
+<!--
+  eCommsZone — Transactional Template
+  Name: order-confirmation
+  Channel: email
+  Triggered by: order.created (eCommZone marketplace, RRR Rewards redemptions)
+  Merge tokens (listmonk / Brevo style):
+    {{ .Subscriber.FirstName }}     — recipient first name
+    {{ .Tx.OrderNumber }}           — human-readable order number
+    {{ .Tx.OrderDate }}             — formatted date
+    {{ .Tx.Items }}                 — array of line items (Name, Qty, Price)
+    {{ .Tx.Subtotal }}              — formatted money string
+    {{ .Tx.Shipping }}              — formatted money string
+    {{ .Tx.Tax }}                   — formatted money string
+    {{ .Tx.Total }}                 — formatted money string
+    {{ .Tx.OrderUrl }}              — link to order detail page
+    {{ UnsubscribeURL }}            — listmonk auto-injected
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order confirmation — {{ .Tx.OrderNumber }}</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f5f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1a1a1a;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center" style="padding:24px 12px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+            <!-- Header -->
+            <tr>
+              <td style="padding:24px 32px;background:#0b3d91;color:#ffffff;">
+                <h1 style="margin:0;font-size:20px;font-weight:600;">OmniQuest Media</h1>
+                <p style="margin:4px 0 0;font-size:13px;opacity:0.85;">Order confirmation</p>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding:32px;">
+                <h2 style="margin:0 0 12px;font-size:22px;">Thanks, {{ .Subscriber.FirstName }} 🎉</h2>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
+                  We&rsquo;ve received your order
+                  <strong>#{{ .Tx.OrderNumber }}</strong> placed on
+                  {{ .Tx.OrderDate }}. You&rsquo;ll receive another email when it ships.
+                </p>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;border-top:1px solid #e5e7eb;">
+                  {{ range .Tx.Items }}
+                  <tr>
+                    <td style="padding:12px 0;border-bottom:1px solid #e5e7eb;font-size:14px;">
+                      <strong>{{ .Name }}</strong><br />
+                      <span style="color:#6b7280;">Qty: {{ .Qty }}</span>
+                    </td>
+                    <td style="padding:12px 0;border-bottom:1px solid #e5e7eb;text-align:right;font-size:14px;">
+                      {{ .Price }}
+                    </td>
+                  </tr>
+                  {{ end }}
+                </table>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;font-size:14px;">
+                  <tr><td>Subtotal</td><td align="right">{{ .Tx.Subtotal }}</td></tr>
+                  <tr><td>Shipping</td><td align="right">{{ .Tx.Shipping }}</td></tr>
+                  <tr><td>Tax</td><td align="right">{{ .Tx.Tax }}</td></tr>
+                  <tr><td style="padding-top:8px;font-weight:700;">Total</td>
+                      <td align="right" style="padding-top:8px;font-weight:700;">{{ .Tx.Total }}</td></tr>
+                </table>
+
+                <p style="margin:24px 0;text-align:center;">
+                  <a href="{{ .Tx.OrderUrl }}"
+                     style="background:#0b3d91;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:600;display:inline-block;">
+                    View your order
+                  </a>
+                </p>
+
+                <p style="margin:16px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">
+                  Need help? Reply to this email or visit our
+                  <a href="https://omniquestmedia.com/support" style="color:#0b3d91;">support center</a>.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer / compliance -->
+            <tr>
+              <td style="padding:20px 32px;background:#f9fafb;font-size:12px;color:#6b7280;line-height:1.5;">
+                <p style="margin:0 0 8px;">
+                  © OmniQuest Media Inc. — 1 OmniQuest Way, Toronto, ON, Canada.
+                </p>
+                <p style="margin:0;">
+                  You are receiving this transactional email because you placed an order with an OmniQuest property.
+                  Manage preferences or
+                  <a href="{{ UnsubscribeURL }}" style="color:#0b3d91;">unsubscribe from marketing</a>.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

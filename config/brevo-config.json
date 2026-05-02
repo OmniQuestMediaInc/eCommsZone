@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_comment": "Brevo (formerly Sendinblue) configuration for eCommsZone. Secrets MUST be injected from environment variables — never commit real keys. This file declares the non-secret operational shape: which channels are enabled, sender identities, webhook routes, suppression policy, and rate limits. The Node.js client and listmonk read this file at boot to validate runtime configuration.",
+
+  "provider": "brevo",
+  "version": "1.0.0",
+  "environment": "${NODE_ENV:-production}",
+
+  "credentials": {
+    "apiKey":        "${BREVO_API_KEY}",
+    "smtpHost":      "${BREVO_SMTP_HOST:-smtp-relay.brevo.com}",
+    "smtpPort":      "${BREVO_SMTP_PORT:-587}",
+    "smtpUser":      "${BREVO_SMTP_USER}",
+    "smtpPassword":  "${BREVO_SMTP_PASSWORD}"
+  },
+
+  "endpoints": {
+    "transactionalEmail": "https://api.brevo.com/v3/smtp/email",
+    "transactionalSms":   "https://api.brevo.com/v3/transactionalSMS/sms",
+    "marketingCampaigns": "https://api.brevo.com/v3/emailCampaigns",
+    "contacts":           "https://api.brevo.com/v3/contacts",
+    "conversations":      "https://api.brevo.com/v3/conversations",
+    "webhooks":           "https://api.brevo.com/v3/webhooks"
+  },
+
+  "channels": {
+    "email": {
+      "enabled": true,
+      "defaultSender": {
+        "name":  "${BREVO_FROM_NAME:-OmniQuest Media}",
+        "email": "${BREVO_FROM_EMAIL:-no-reply@omniquestmedia.com}"
+      },
+      "replyTo": "support@omniquestmedia.com",
+      "trackOpens":  true,
+      "trackClicks": true,
+      "headers": {
+        "X-OQMI-Service": "eCommsZone"
+      }
+    },
+    "sms": {
+      "enabled": true,
+      "sender":  "${BREVO_SMS_SENDER:-OQMI}",
+      "type":    "transactional",
+      "unicodeEnabled": true
+    },
+    "conversations": {
+      "enabled": true,
+      "defaultAgentEmail": "support@omniquestmedia.com"
+    }
+  },
+
+  "rateLimits": {
+    "_comment": "Soft client-side limits. Brevo enforces its own; these prevent self-DoS.",
+    "emailPerSecond":   50,
+    "smsPerSecond":     5,
+    "burstMultiplier":  2,
+    "retry": {
+      "maxAttempts":  3,
+      "backoffMs":    500,
+      "backoffMaxMs": 8000,
+      "jitter":       true
+    }
+  },
+
+  "suppression": {
+    "honorBrevoBlocklist": true,
+    "syncToListmonk":      true,
+    "syncIntervalSeconds": 300
+  },
+
+  "webhooks": {
+    "_comment": "Brevo posts delivery events here; eCommsZone forwards them to listmonk for closed-loop suppression.",
+    "deliveryEventsUrl":  "${ECOMMSZONE_API_BASE_URL}/webhooks/brevo/email",
+    "smsEventsUrl":       "${ECOMMSZONE_API_BASE_URL}/webhooks/brevo/sms",
+    "inboundEmailUrl":    "${ECOMMSZONE_API_BASE_URL}/webhooks/brevo/inbound",
+    "events": [
+      "delivered",
+      "soft_bounce",
+      "hard_bounce",
+      "spam",
+      "unsubscribed",
+      "opened",
+      "clicked",
+      "deferred",
+      "blocked",
+      "invalid_email"
+    ]
+  },
+
+  "templates": {
+    "_comment": "Mapping of OQMI logical template IDs to Brevo template IDs. Update when templates are published in Brevo. Use null when the template lives in listmonk instead.",
+    "order-confirmation":     null,
+    "shipping-notification":  null,
+    "rrr-points-alert":       null,
+    "password-reset":         null,
+    "2fa-sms":                null
+  },
+
+  "compliance": {
+    "region":              "global",
+    "gdprMode":            true,
+    "canSpamFooter":       true,
+    "caslDoubleOptIn":     true,
+    "tcpaSmsConsent":      true,
+    "physicalAddress":     "OmniQuest Media Inc., 1 OmniQuest Way, Toronto, ON, Canada",
+    "unsubscribeMandatory": true
+  }
+}

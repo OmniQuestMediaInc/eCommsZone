@@ -1,0 +1,81 @@
+<!--
+  eCommsZone — Transactional Template
+  Name: shipping-notification
+  Channel: email
+  Triggered by: order.shipped
+  Merge tokens:
+    {{ .Subscriber.FirstName }}
+    {{ .Tx.OrderNumber }}
+    {{ .Tx.Carrier }}             — e.g. "Canada Post"
+    {{ .Tx.TrackingNumber }}
+    {{ .Tx.TrackingUrl }}
+    {{ .Tx.EstimatedDelivery }}
+    {{ .Tx.ShipTo }}              — formatted address (multiline allowed)
+    {{ UnsubscribeURL }}
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your order is on the way — {{ .Tx.OrderNumber }}</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f5f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1a1a1a;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center" style="padding:24px 12px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+            <tr>
+              <td style="padding:24px 32px;background:#0b3d91;color:#ffffff;">
+                <h1 style="margin:0;font-size:20px;font-weight:600;">OmniQuest Media</h1>
+                <p style="margin:4px 0 0;font-size:13px;opacity:0.85;">Shipping notification</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:32px;">
+                <h2 style="margin:0 0 12px;font-size:22px;">📦 It&rsquo;s on the way, {{ .Subscriber.FirstName }}!</h2>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
+                  Your order <strong>#{{ .Tx.OrderNumber }}</strong> has shipped via
+                  <strong>{{ .Tx.Carrier }}</strong>.
+                </p>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                       style="margin:16px 0;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;">
+                  <tr>
+                    <td style="padding:16px;font-size:14px;">
+                      <p style="margin:0 0 6px;color:#6b7280;">Tracking number</p>
+                      <p style="margin:0;font-weight:600;font-size:16px;">{{ .Tx.TrackingNumber }}</p>
+                      <p style="margin:12px 0 6px;color:#6b7280;">Estimated delivery</p>
+                      <p style="margin:0;font-weight:600;">{{ .Tx.EstimatedDelivery }}</p>
+                    </td>
+                  </tr>
+                </table>
+
+                <p style="margin:24px 0;text-align:center;">
+                  <a href="{{ .Tx.TrackingUrl }}"
+                     style="background:#0b3d91;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:600;display:inline-block;">
+                    Track your package
+                  </a>
+                </p>
+
+                <p style="margin:16px 0 4px;font-size:13px;color:#6b7280;">Shipping to:</p>
+                <p style="margin:0;font-size:14px;line-height:1.5;white-space:pre-line;">{{ .Tx.ShipTo }}</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:20px 32px;background:#f9fafb;font-size:12px;color:#6b7280;line-height:1.5;">
+                <p style="margin:0 0 8px;">© OmniQuest Media Inc. — 1 OmniQuest Way, Toronto, ON, Canada.</p>
+                <p style="margin:0;">
+                  Transactional email regarding your order.
+                  <a href="{{ UnsubscribeURL }}" style="color:#0b3d91;">Manage preferences</a>.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

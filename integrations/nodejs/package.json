@@ -1,0 +1,36 @@
+{
+  "name": "@omniquest/ecommszone-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Official Node.js / TypeScript client for the OmniQuest eCommsZone communications service bureau (email, SMS, bulk).",
+  "license": "SEE LICENSE IN ../../LICENSE",
+  "author": "OmniQuest Media Inc. <engineering@omniquestmedia.com>",
+  "main": "dist/ecommszone-client.js",
+  "types": "dist/ecommszone-client.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OmniQuestMediaInc/eCommsZone.git",
+    "directory": "integrations/nodejs"
+  }
+}

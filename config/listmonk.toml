@@ -1,0 +1,100 @@
+# =============================================================================
+# listmonk configuration — eCommsZone
+# Reference: https://listmonk.app/docs/configuration/
+# Most secrets are injected via environment variables (see docker-compose.yml
+# and .env.example). This file holds non-secret defaults.
+# =============================================================================
+
+[app]
+# Bind on all interfaces inside the container; the published port is mapped
+# in docker-compose.yml.
+address = "0.0.0.0:9000"
+
+# Public-facing URL (used for unsubscribe links, tracking pixels, webhooks).
+# Override in production via the LISTMONK_app__root_url env var.
+root_url = "https://comms.omniquestmedia.com"
+
+# Default "from" identity for messages that do not specify one.
+from_email = "OmniQuest Media <no-reply@omniquestmedia.com>"
+
+# UI logo / favicon — override per environment if needed.
+logo_url  = "https://comms.omniquestmedia.com/static/logo.png"
+favicon_url = "https://comms.omniquestmedia.com/static/favicon.png"
+
+# Notification recipients (ops alerts, bounce thresholds, etc.)
+notify_emails = ["ops@omniquestmedia.com"]
+
+# Concurrency tuning. Brevo's sustained throughput on the standard plan is
+# generous; tune these per environment.
+concurrency        = 10
+message_rate       = 50           # messages per second per worker
+batch_size         = 1000
+max_send_errors    = 1000
+sliding_window     = false
+
+# Bounces / complaints: feed Brevo webhooks into listmonk for closed-loop
+# suppression. See docs/SETUP.md.
+enable_public_archive    = false
+enable_public_subscription = false
+
+# -----------------------------------------------------------------------------
+# Database — overridden by LISTMONK_db__* env vars in docker-compose.yml.
+# Values here are safe local defaults.
+# -----------------------------------------------------------------------------
+[db]
+host     = "db"
+port     = 5432
+user     = "listmonk"
+password = ""              # injected via env
+database = "listmonk"
+ssl_mode = "disable"
+max_open = 25
+max_idle = 25
+max_lifetime = "300s"
+
+# -----------------------------------------------------------------------------
+# SMTP — Brevo relay. Credentials are injected from .env.
+# All transactional + campaign mail flows through this single relay so that
+# Brevo handles deliverability, suppressions, and analytics.
+# -----------------------------------------------------------------------------
+[[smtp]]
+enabled        = true
+host           = "smtp-relay.brevo.com"
+port           = 587
+auth_protocol  = "login"
+username       = "$BREVO_SMTP_USER"
+password       = "$BREVO_SMTP_PASSWORD"
+hello_hostname = "comms.omniquestmedia.com"
+max_conns      = 10
+max_msg_retries = 2
+idle_timeout   = "15s"
+wait_timeout   = "5s"
+tls_type       = "STARTTLS"
+tls_skip_verify = false
+email_headers  = [
+  { header = "X-OQMI-Service", value = "eCommsZone" },
+  { header = "X-OQMI-Tenant",  value = "OmniQuest" }
+]
+
+# -----------------------------------------------------------------------------
+# Messengers — additional channels (e.g. Brevo SMS via webhook/HTTP).
+# Configured at runtime through the listmonk admin UI.
+# -----------------------------------------------------------------------------
+[upload]
+provider   = "filesystem"
+filesystem.upload_path = "/listmonk/uploads"
+filesystem.upload_uri  = "/uploads"
+max_file_size = "10485760"   # 10 MB
+extensions    = ["png", "jpg", "jpeg", "gif", "svg", "pdf"]
+
+# -----------------------------------------------------------------------------
+# Privacy / compliance
+# -----------------------------------------------------------------------------
+[privacy]
+individual_tracking = false   # default off; enable per-campaign as needed
+unsubscribe_header  = true    # List-Unsubscribe / one-click (RFC 8058)
+allow_blocklist     = true
+allow_export        = true
+allow_wipe          = true
+exportable          = ["profile", "subscriptions", "campaign_views", "link_clicks"]
+domain_blocklist    = []

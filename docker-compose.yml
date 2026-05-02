@@ -1,0 +1,89 @@
+# =============================================================================
+# eCommsZone — docker-compose.yml
+# Centralized communications service bureau for OmniQuest Media Inc.
+# Stack: listmonk (orchestration) + PostgreSQL (storage). Delivery is
+# performed by Brevo via SMTP / API and is configured at the application
+# layer (config/listmonk.toml, .env).
+# =============================================================================
+
+name: ecommszone
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL — backing store for listmonk (subscribers, campaigns, logs)
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: ecommszone-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-listmonk}
+      POSTGRES_USER: ${POSTGRES_USER:-listmonk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - ecommszone
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-listmonk} -d ${POSTGRES_DB:-listmonk}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    # Postgres should never be exposed to the host network in production.
+    # Uncomment only for local debugging.
+    # ports:
+    #   - "5432:5432"
+
+  # ---------------------------------------------------------------------------
+  # listmonk — orchestration layer for email + SMS campaigns / transactional
+  # ---------------------------------------------------------------------------
+  listmonk:
+    image: listmonk/listmonk:v3.0.0
+    container_name: ecommszone-listmonk
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${LISTMONK_PORT:-9000}:9000"
+    environment:
+      # listmonk reads its DB connection from these env vars (overrides config).
+      LISTMONK_db__host: db
+      LISTMONK_db__port: "5432"
+      LISTMONK_db__user: ${POSTGRES_USER:-listmonk}
+      LISTMONK_db__password: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      LISTMONK_db__database: ${POSTGRES_DB:-listmonk}
+      LISTMONK_db__ssl_mode: disable
+      # Admin bootstrap — set in .env, never commit.
+      LISTMONK_ADMIN_USER: ${LISTMONK_ADMIN_USER:?LISTMONK_ADMIN_USER is required}
+      LISTMONK_ADMIN_PASSWORD: ${LISTMONK_ADMIN_PASSWORD:?LISTMONK_ADMIN_PASSWORD is required}
+      # Brevo SMTP credentials — used by listmonk to dispatch mail.
+      BREVO_SMTP_HOST: ${BREVO_SMTP_HOST:-smtp-relay.brevo.com}
+      BREVO_SMTP_PORT: ${BREVO_SMTP_PORT:-587}
+      BREVO_SMTP_USER: ${BREVO_SMTP_USER}
+      BREVO_SMTP_PASSWORD: ${BREVO_SMTP_PASSWORD}
+      BREVO_API_KEY: ${BREVO_API_KEY}
+    volumes:
+      - ./config/listmonk.toml:/listmonk/config.toml:ro
+      - ./templates:/listmonk/static/templates:ro
+      - listmonk-uploads:/listmonk/uploads
+    networks:
+      - ecommszone
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  db-data:
+    name: ecommszone_db-data
+  listmonk-uploads:
+    name: ecommszone_listmonk-uploads
+
+networks:
+  ecommszone:
+    name: ecommszone
+    driver: bridge
