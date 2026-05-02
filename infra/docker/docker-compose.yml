@@ -1,0 +1,123 @@
+version: '3.9'
+
+services:
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecommszone_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ecommszone}
+      POSTGRES_USER: ${POSTGRES_USER:-ecommszone}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecommszone}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommszone_net
+
+  # ── Redis ────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ecommszone_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommszone_net
+
+  # ── listmonk ─────────────────────────────────────────────────────────────────
+  listmonk:
+    image: listmonk/listmonk:latest
+    container_name: ecommszone_listmonk
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      LISTMONK_app__address: "0.0.0.0:9000"
+      LISTMONK_db__host: postgres
+      LISTMONK_db__port: "5432"
+      LISTMONK_db__user: ${POSTGRES_USER:-ecommszone}
+      LISTMONK_db__password: ${POSTGRES_PASSWORD:-changeme}
+      LISTMONK_db__database: ${POSTGRES_DB:-ecommszone}
+      LISTMONK_db__ssl_mode: disable
+    volumes:
+      - ../../listmonk/config.toml:/listmonk/config.toml:ro
+      - listmonk_uploads:/listmonk/uploads
+    ports:
+      - "127.0.0.1:9000:9000"
+    networks:
+      - ecommszone_net
+
+  # ── eCommsZone API Gateway ───────────────────────────────────────────────────
+  api:
+    build:
+      context: ../../api
+      dockerfile: Dockerfile
+      target: development
+    container_name: ecommszone_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      listmonk:
+        condition: service_started
+    env_file:
+      - ../../.env
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379
+      LISTMONK_BASE_URL: http://listmonk:9000
+    volumes:
+      - ../../api:/app
+      - /app/node_modules
+    ports:
+      - "4000:4000"
+    networks:
+      - ecommszone_net
+
+  # ── Nginx (reverse proxy) ────────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: ecommszone_nginx
+    restart: unless-stopped
+    depends_on:
+      - api
+      - listmonk
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/sites-available/ecommszone.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - ecommszone_net
+
+volumes:
+  postgres_data:
+  redis_data:
+  listmonk_uploads:
+
+networks:
+  ecommszone_net:
+    driver: bridge

@@ -1,0 +1,17 @@
+{
+  "tenantId": "cyrano",
+  "displayName": "Cyrano",
+  "listmonk": {
+    "defaultListId": null,
+    "transactionalTemplateId": null
+  },
+  "brevo": {
+    "senderEmail": "hello@cyrano.ai",
+    "senderName": "Cyrano",
+    "smsSender": "Cyrano"
+  },
+  "rateLimit": {
+    "emailPerMinute": 60,
+    "smsPerMinute": 15
+  }
+}

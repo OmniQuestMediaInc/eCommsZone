@@ -1,0 +1,17 @@
+{
+  "tenantId": "omniquest-internal",
+  "displayName": "OmniQuest Internal",
+  "listmonk": {
+    "defaultListId": null,
+    "transactionalTemplateId": null
+  },
+  "brevo": {
+    "senderEmail": "internal@omniquest.media",
+    "senderName": "OmniQuest Ops",
+    "smsSender": "OmniQuest"
+  },
+  "rateLimit": {
+    "emailPerMinute": 200,
+    "smsPerMinute": 50
+  }
+}

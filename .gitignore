@@ -1,3 +1,57 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+out/
+.next/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker volumes / data
+infra/postgres/data/
+infra/redis/data/
+listmonk/uploads/
+
+# listmonk generated
+listmonk/config.toml.bak
+
+# Secrets / certs
+*.pem
+*.key
+*.crt
+secrets/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+tmp/
 # =============================================================================
 # eCommsZone — .gitignore
 # OmniQuest Media Inc. | PROGRAM_CONTROL: MKTP-WORK-004

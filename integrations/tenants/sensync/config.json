@@ -1,0 +1,17 @@
+{
+  "tenantId": "sensync",
+  "displayName": "SenSync",
+  "listmonk": {
+    "defaultListId": null,
+    "transactionalTemplateId": null
+  },
+  "brevo": {
+    "senderEmail": "care@sensync.com",
+    "senderName": "SenSync Care Team",
+    "smsSender": "SenSync"
+  },
+  "rateLimit": {
+    "emailPerMinute": 60,
+    "smsPerMinute": 30
+  }
+}

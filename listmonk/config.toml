@@ -1,0 +1,70 @@
+# listmonk configuration
+# This file is mounted read-only into the listmonk container.
+# Sensitive values are provided via LISTMONK_* environment variables
+# (Docker Compose env overrides take precedence over values set here).
+# See: https://listmonk.app/docs/configuration/
+
+[app]
+address = "0.0.0.0:9000"
+admin_username = "admin"
+# admin_password is set via LISTMONK_app__admin_password env variable
+
+[db]
+host = "postgres"
+port = 5432
+user = "ecommszone"
+password = ""          # set via LISTMONK_db__password env variable
+database = "ecommszone"
+ssl_mode = "disable"
+max_open = 25
+max_idle = 25
+max_lifetime = "300s"
+
+[smtp]
+# Primary SMTP — Brevo relay
+[[smtp]]
+enabled = true
+host = "smtp-relay.brevo.com"
+hello_hostname = ""
+port = 587
+auth_protocol = "login"
+username = ""          # set via LISTMONK_smtp__0__username env variable
+password = ""          # set via LISTMONK_smtp__0__password env variable
+email_headers = []
+max_conns = 10
+max_msg_retries = 2
+idle_timeout = "15s"
+wait_timeout = "5s"
+tls_enabled = true
+tls_skip_verify = false
+
+[upload]
+provider = "filesystem"
+
+[upload.filesystem]
+upload_path = "uploads"
+upload_uri = "/uploads"
+
+[messengers]
+# No additional custom messengers configured by default.
+# Add Brevo Conversations webhook here if direct integration is needed.
+
+[privacy]
+individual_tracking = false
+unsubscribe_header = true
+allow_blocklist = false
+allow_export = false
+allow_wipe = false
+
+[bounce]
+enabled = true
+webhooks_enabled = true
+
+[bounce.ses]
+enabled = false
+
+[bounce.sendgrid]
+enabled = false
+
+[bounce.postmark]
+enabled = false

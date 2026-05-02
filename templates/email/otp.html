@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your verification code</title>
+  <style>
+    body { margin: 0; padding: 0; background: #f4f4f4; font-family: Arial, sans-serif; }
+    .wrapper { max-width: 480px; margin: 40px auto; background: #ffffff; border-radius: 6px; overflow: hidden; }
+    .header { background: #1a1a2e; padding: 24px; text-align: center; }
+    .body { padding: 40px; color: #333333; line-height: 1.6; text-align: center; }
+    .code { font-size: 42px; font-weight: bold; letter-spacing: 12px; color: #e94560; margin: 24px 0; }
+    .footer { background: #f4f4f4; padding: 20px; font-size: 12px; color: #888888; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <span style="color:#ffffff;font-size:20px;font-weight:bold;">{{ tenant_name }}</span>
+    </div>
+    <div class="body">
+      <p>Your one-time verification code is:</p>
+      <div class="code">{{ otp_code }}</div>
+      <p style="font-size:13px;color:#666;">
+        This code expires in <strong>{{ expiry_minutes }} minutes</strong>.<br/>
+        Never share this code with anyone.
+      </p>
+    </div>
+    <div class="footer">
+      <p>© {{ year }} {{ tenant_name }}</p>
+    </div>
+  </div>
+</body>
+</html>

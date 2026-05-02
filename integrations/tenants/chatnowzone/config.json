@@ -1,0 +1,17 @@
+{
+  "tenantId": "chatnowzone",
+  "displayName": "ChatNowZone",
+  "listmonk": {
+    "defaultListId": null,
+    "transactionalTemplateId": null
+  },
+  "brevo": {
+    "senderEmail": "noreply@chatnowzone.com",
+    "senderName": "ChatNowZone",
+    "smsSender": "ChatNow"
+  },
+  "rateLimit": {
+    "emailPerMinute": 120,
+    "smsPerMinute": 20
+  }
+}

@@ -1,0 +1,16 @@
+# SMS Templates
+# Format: TEMPLATE_NAME | max_chars | body
+# Use {{ variable }} for substitutions.
+# Keep each message under 160 chars for single-segment delivery.
+
+welcome=Your {{ tenant_name }} account is ready! Sign in at {{ login_url }}
+
+otp=Your {{ tenant_name }} code: {{ otp_code }}. Expires in {{ expiry_minutes }} min. Do NOT share.
+
+password_reset=Reset your {{ tenant_name }} password: {{ reset_url }} — link expires in 30 min.
+
+order_confirmation=Hi {{ first_name }}, your {{ tenant_name }} order #{{ order_id }} is confirmed. Track: {{ tracking_url }}
+
+appointment_reminder=Reminder: {{ appointment_description }} on {{ appointment_date }} at {{ appointment_time }}. Reply STOP to opt out.
+
+marketing_promo={{ tenant_name }}: {{ promo_message }} {{ promo_url }} Reply STOP to opt out.
