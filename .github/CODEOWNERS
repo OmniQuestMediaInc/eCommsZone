@@ -1,0 +1,23 @@
+# Global owners — all PRs require review from DevOps Core
+*                               @OmniQuestMediaInc/devops-core
+
+# API gateway
+/api/                           @OmniQuestMediaInc/devops-core @OmniQuestMediaInc/backend-engineers
+
+# Infrastructure / Docker / Nginx
+/infra/                         @OmniQuestMediaInc/devops-core
+
+# listmonk config
+/listmonk/                      @OmniQuestMediaInc/devops-core
+
+# Integrations
+/integrations/                  @OmniQuestMediaInc/devops-core @OmniQuestMediaInc/backend-engineers
+
+# Templates
+/templates/                     @OmniQuestMediaInc/devops-core @OmniQuestMediaInc/marketing-ops
+
+# Documentation
+/docs/                          @OmniQuestMediaInc/devops-core
+
+# CI/CD workflows
+/.github/workflows/             @OmniQuestMediaInc/devops-core

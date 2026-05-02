@@ -1,0 +1,17 @@
+{
+  "tenantId": "redroompleasures",
+  "displayName": "RedRoomPleasures",
+  "listmonk": {
+    "defaultListId": null,
+    "transactionalTemplateId": null
+  },
+  "brevo": {
+    "senderEmail": "noreply@redroompleasures.com",
+    "senderName": "RedRoomPleasures",
+    "smsSender": "RRP"
+  },
+  "rateLimit": {
+    "emailPerMinute": 60,
+    "smsPerMinute": 10
+  }
+}
