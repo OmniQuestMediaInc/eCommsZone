@@ -1,0 +1,17 @@
+{
+  "tenantId": "redroomrewards",
+  "displayName": "RedRoomRewards",
+  "listmonk": {
+    "defaultListId": null,
+    "transactionalTemplateId": null
+  },
+  "brevo": {
+    "senderEmail": "rewards@redroomrewards.com",
+    "senderName": "RedRoom Rewards",
+    "smsSender": "RRRewards"
+  },
+  "rateLimit": {
+    "emailPerMinute": 60,
+    "smsPerMinute": 10
+  }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to {{ tenant_name }}</title>
+  <style>
+    body { margin: 0; padding: 0; background: #f4f4f4; font-family: Arial, sans-serif; }
+    .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 6px; overflow: hidden; }
+    .header { background: #1a1a2e; padding: 32px 40px; text-align: center; }
+    .body { padding: 40px; color: #333333; line-height: 1.6; }
+    .body h1 { font-size: 26px; margin-top: 0; }
+    .cta { display: inline-block; margin: 24px 0; padding: 14px 28px; background: #e94560; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; }
+    .footer { background: #f4f4f4; padding: 24px 40px; font-size: 12px; color: #888888; text-align: center; }
+    .footer a { color: #888888; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <span style="color:#ffffff;font-size:22px;font-weight:bold;">{{ tenant_name }}</span>
+    </div>
+    <div class="body">
+      <h1>Welcome, {{ first_name }}! 🎉</h1>
+      <p>Thanks for joining <strong>{{ tenant_name }}</strong>. Your account is ready.</p>
+      <p>Click below to get started:</p>
+      <a href="{{ activation_url }}" class="cta">Activate My Account</a>
+      <p style="font-size:13px;color:#666;">
+        This link expires in 24 hours. If you didn't create an account, ignore this email.
+      </p>
+    </div>
+    <div class="footer">
+      <p>© {{ year }} {{ tenant_name }}. All rights reserved.</p>
+      <p>
+        <a href="{{ unsubscribe_url }}">Unsubscribe</a> ·
+        <a href="{{ privacy_url }}">Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -87,3 +87,100 @@ networks:
   ecommszone:
     name: ecommszone
     driver: bridge
+# eCommsZone — Docker Compose (Production)
+# OmniQuest Media Inc. | PROGRAM_CONTROL: MKTP-WORK-004
+# =============================================================================
+# Usage:
+#   cp .env.example .env   # fill in secrets
+#   docker compose up -d
+# =============================================================================
+
+version: "3.9"
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # listmonk — self-hosted newsletter & transactional email manager
+  # ---------------------------------------------------------------------------
+  listmonk:
+    image: listmonk/listmonk:v4.1.0
+    container_name: ecommszone_listmonk
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9000:9000"   # Bind to localhost only; expose via reverse proxy
+    environment:
+      LISTMONK_app__address: "0.0.0.0:9000"
+      LISTMONK_app__admin_username: "${LISTMONK_ADMIN_USER}"
+      LISTMONK_app__admin_password: "${LISTMONK_ADMIN_PASSWORD}"
+      LISTMONK_db__host: "db"
+      LISTMONK_db__port: "5432"
+      LISTMONK_db__user: "${POSTGRES_USER}"
+      LISTMONK_db__password: "${POSTGRES_PASSWORD}"
+      LISTMONK_db__database: "${POSTGRES_DB}"
+      LISTMONK_db__ssl_mode: "disable"
+    volumes:
+      - listmonk_uploads:/listmonk/uploads
+      - ./config/listmonk.toml:/listmonk/config.toml:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ecommszone_net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    labels:
+      com.oqmi.service: "listmonk"
+      com.oqmi.project: "eCommsZone"
+      com.oqmi.managed-by: "PROGRAM_CONTROL/MKTP-WORK-004"
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL — persistent data store for listmonk
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: ecommszone_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommszone_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    labels:
+      com.oqmi.service: "postgres"
+      com.oqmi.project: "eCommsZone"
+      com.oqmi.managed-by: "PROGRAM_CONTROL/MKTP-WORK-004"
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    driver: local
+    labels:
+      com.oqmi.project: "eCommsZone"
+  listmonk_uploads:
+    driver: local
+    labels:
+      com.oqmi.project: "eCommsZone"
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  ecommszone_net:
+    driver: bridge
+    labels:
+      com.oqmi.project: "eCommsZone"
