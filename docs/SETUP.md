@@ -77,7 +77,8 @@ sudo apt update && sudo apt upgrade -y
 
 # Create a non-root deploy user
 sudo adduser deploy
-sudo usermod -aG sudo docker deploy
+sudo usermod -aG sudo deploy
+# Note: 'docker' group is added in step 4 after Docker is installed
 
 # Disable root SSH login
 sudo sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config

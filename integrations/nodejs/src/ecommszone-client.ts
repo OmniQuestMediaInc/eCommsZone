@@ -252,9 +252,15 @@ export class ECommsZoneClient {
 
   /** HTTP headers for Brevo API requests. */
   private brevoHeaders(): Record<string, string> {
+    if (!this.brevoApiKey) {
+      throw new Error(
+        '[ECommsZoneClient] brevoApiKey is required for Brevo API calls. ' +
+          'Set BREVO_API_KEY in your environment.'
+      );
+    }
     return {
       'Content-Type': 'application/json',
-      'api-key': this.brevoApiKey!,
+      'api-key': this.brevoApiKey,
       accept: 'application/json',
     };
   }
