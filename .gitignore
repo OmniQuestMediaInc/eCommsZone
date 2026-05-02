@@ -1,0 +1,40 @@
+# =============================================================================
+# eCommsZone — .gitignore
+# OmniQuest Media Inc. | PROGRAM_CONTROL: MKTP-WORK-004
+# =============================================================================
+
+# --- Secrets (NEVER commit these) ---
+.env
+*.env
+.env.local
+.env.*.local
+
+# --- Node.js ---
+node_modules/
+dist/
+build/
+*.js.map
+*.d.ts.map
+
+# --- TypeScript build output ---
+integrations/nodejs/dist/
+
+# --- OS & editor artifacts ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- Docker ---
+# Local override files
+docker-compose.override.yml
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Backups ---
+backups/
+*.sql.gz

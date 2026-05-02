@@ -1,0 +1,121 @@
+# =============================================================================
+# listmonk — Default Configuration
+# OmniQuest Media Inc. | PROGRAM_CONTROL: MKTP-WORK-004
+# =============================================================================
+# This file is mounted read-only into the listmonk container.
+# Sensitive values (DB credentials, SMTP passwords) are injected via
+# environment variables defined in docker-compose.yml / .env.
+#
+# Full reference: https://listmonk.app/docs/configuration/
+# =============================================================================
+
+[app]
+  # Server listen address (container-internal; Docker maps to host port 9000)
+  address = "0.0.0.0:9000"
+
+  # Site name shown in the listmonk UI and outgoing email footers
+  name = "eCommsZone — OmniQuest Media"
+
+  # Root URL used for generating unsubscribe links, campaign reports, etc.
+  # IMPORTANT: Update this to your production domain before sending any campaigns.
+  root_url = "https://comms.yourdomain.ca"
+
+  # Maximum number of records returned per API page
+  max_sendqueue_size = 1000
+
+  # Favicon and logo (relative to uploads dir or absolute URL)
+  favicon_url = ""
+  logo_url    = ""
+
+  # Enable the default landing page (subscriber-facing)
+  enable_public_subscription_page = true
+
+  # Cache TTL for templates (seconds); reduce to 0 in development
+  cache_slow_queries = false
+
+  # Batch size for subscriber import
+  batch_size = 1000
+
+[privacy]
+  # Individual data export / erasure (CASL/GDPR compliance)
+  allow_blocklist  = true
+  allow_export     = true
+  allow_wipe       = true
+
+  # Automatically wipe subscriber PII on unsubscribe
+  exportable_fields = ["name", "email", "attributes"]
+
+[security]
+  # OIDC / OAuth (leave empty to use built-in user/password auth)
+  oidc_provider_url      = ""
+  oidc_client_id         = ""
+  oidc_client_secret     = ""
+  oidc_redirect_url      = ""
+
+[db]
+  # Connection values are overridden by LISTMONK_db__* environment variables
+  # (set in docker-compose.yml). Values here serve as documentation only.
+  host     = "db"
+  port     = 5432
+  user     = "listmonk"
+  password = ""          # Injected via LISTMONK_db__password env var
+  database = "listmonk"
+  ssl_mode = "disable"
+  max_open  = 25
+  max_idle  = 25
+  max_lifetime = "300s"
+
+[smtp]
+  # Brevo SMTP relay — primary outbound channel
+  # Credentials are set via environment variables and injected through
+  # listmonk's "Settings → SMTP" UI after first run, OR pre-seeded via
+  # the listmonk provisioning API.
+  #
+  # Host:     smtp-relay.brevo.com
+  # Port:     587
+  # Auth:     LOGIN
+  # TLS:      STARTTLS
+  #
+  # NOTE: listmonk stores SMTP settings in the database (not this file).
+  # The values here are for documentation and initial setup reference only.
+
+[upload]
+  # Storage backend for campaign media uploads
+  provider = "filesystem"
+
+  [upload.filesystem]
+    upload_path = "/listmonk/uploads"
+    upload_uri  = "/uploads"
+
+  [upload.s3]
+    # Uncomment and configure to use S3-compatible object storage
+    # aws_access_key_id     = ""
+    # aws_secret_access_key = ""
+    # aws_default_region    = "ca-central-1"
+    # bucket                = ""
+    # bucket_domain         = ""
+    # bucket_path           = "/"
+    # public_url            = ""
+
+[messengers]
+  # listmonk supports custom messenger plugins for SMS, Slack, etc.
+  # Brevo SMS is handled via the eCommsZone TypeScript client directly
+  # (see integrations/nodejs/src/ecommszone-client.ts).
+
+[bounce]
+  # Bounce handling — poll mailbox for bounce notifications
+  enabled = false
+  # Uncomment and configure IMAP settings to enable bounce processing
+  # [bounce.mailboxes]
+  #   [[bounce.mailboxes.mailbox]]
+  #     host     = "imap.yourdomain.ca"
+  #     port     = 993
+  #     auth_protocol = "userpass"
+  #     username = "bounces@yourdomain.ca"
+  #     password = ""
+  #     tls_enabled      = true
+  #     tls_skip_verify  = false
+  #     scan_interval    = "15m"
+
+[log]
+  level = "info"   # Options: debug | info | warn | error
