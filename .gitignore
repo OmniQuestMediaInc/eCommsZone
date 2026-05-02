@@ -1,3 +1,29 @@
+# =============================================================================
+# eCommsZone — .gitignore
+# =============================================================================
+
+# Secrets / environment
+.env
+.env.*
+!.env.example
+*.secret
+*.secret.*
+*.pem
+*.key
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Editors / OS
 # Dependencies
 node_modules/
 .pnp
@@ -30,6 +56,28 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+.DS_Store
+Thumbs.db
+
+# Docker / runtime
+*.log
+logs/
+tmp/
+.cache/
+
+# listmonk uploads / local data (when bind-mounted in dev)
+uploads/
+data/
+
+# Python (utility scripts, if any)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Test / lint artifacts
+.eslintcache
+.stylelintcache
 
 # Docker volumes / data
 infra/postgres/data/

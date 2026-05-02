@@ -1,0 +1,8 @@
+# Marketing templates live here.
+#
+# Canonical marketing templates (newsletters, promotions, lifecycle drips,
+# RRR Rewards campaigns, etc.) will be authored in this directory and
+# published to listmonk via the admin UI or `listmonk` API.
+#
+# This file exists to keep the directory under version control until the
+# first marketing template is added (tracked under MKTP_WORK-005).
