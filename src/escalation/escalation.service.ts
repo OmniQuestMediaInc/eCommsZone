@@ -262,6 +262,16 @@ function parseFloatEnv(raw: string | undefined, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+/** Intents that route to Standard CS by default (Rule 7). Module-level so it
+ *  is allocated once rather than on every {@link EscalationService.decide} call. */
+const DEFAULT_HUMAN_INTENTS: readonly Intent[] = [
+  'general_inquiry',
+  'delivery',
+  'product_question',
+  'password_reset',
+  'billing_dispute', // low-value dispute
+] as const;
+
 // ---------------------------------------------------------------------------
 // Service
 // ---------------------------------------------------------------------------
@@ -450,14 +460,7 @@ export class EscalationService {
     }
 
     // Rule 7 — default human queue intents
-    const defaultHumanIntents: Intent[] = [
-      'general_inquiry',
-      'delivery',
-      'product_question',
-      'password_reset',
-      'billing_dispute', // low-value dispute
-    ];
-    if (defaultHumanIntents.includes(triage.intent)) {
+    if (DEFAULT_HUMAN_INTENTS.includes(triage.intent)) {
       return {
         tier: 'standard_cs',
         priority: 'P3',
@@ -476,12 +479,14 @@ export class EscalationService {
       };
     }
 
-    // Catch-all (treat as default human queue rather than dropping).
+    // Rule 9 — catch-all fallback. Uses a distinct rule number from Rule 7 so
+    // analytics can tell explicit default-intent matches apart from
+    // unmatched-intent fallbacks.
     return {
       tier: 'standard_cs',
       priority: 'P3',
       reasonCode: 'DEFAULT_HUMAN',
-      matchedRule: 7,
+      matchedRule: 9,
     };
   }
 
